@@ -1,5 +1,12 @@
-.App {
+/* .App {
   text-align: center;
+} */
+
+html,
+body,
+.App,
+.App > div {
+  height: 100%;
 }
 
 .App-logo {
