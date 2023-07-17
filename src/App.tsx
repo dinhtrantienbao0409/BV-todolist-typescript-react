@@ -3,7 +3,6 @@ import "./App.css";
 import { AddField } from "./components/AddField/AddField";
 import { TodoList } from "./components/TodoList/TodoList";
 import { styled } from "styled-components";
-import { Popup } from "./components/Popup/Popup";
 
 const AppContainer = styled.div`
   display: flex;
@@ -17,6 +16,14 @@ const TodoContainer = styled.div`
   align-items: center;
   width: 50%;
   margin-top: 70px;
+  @media screen and (min-width: 768px) {
+    width: 80%;
+  }
+  @media screen and (max-width: 992px) {
+    .column {
+      width: 50%;
+    }
+  }
 `;
 const TodoUl = styled.ul`
   width: 100%;
@@ -26,26 +33,10 @@ export const App: React.FC = () => {
   return (
     <AppContainer className="App">
       <TodoContainer>
-        {/* <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            width: "50%",
-          }}
-        > */}
-        
         <AddField />
         <TodoUl>
-          <TodoList
-          // key={todo.id}
-          // text={todo.text}
-          // status={todo.status}
-          // checked={todo.checked}
-          // onUpdate={() => handleUpdate(todo.id)}
-          // onDelete={() => handleDelete(todo.id)}
-          />
+          <TodoList />
         </TodoUl>
-        {/* </div> */}
       </TodoContainer>
     </AppContainer>
   );

@@ -1,6 +1,6 @@
 import { styled } from "styled-components";
 import { Status } from "../../constaints";
-
+import React, { useState } from "react";
 
 const TodoPopup = styled.div`
   position: absolute;
@@ -14,10 +14,7 @@ const TodoPopup = styled.div`
   width: 30%;
 `;
 
-const StyledInput = styled.input.attrs((props) => ({
-  // type: "text",
-  // $size: "1em",
-}))`
+const StyledInput = styled.input`
   color: black;
   font-size: 1em;
   border: 1px solid #66ccff;
@@ -26,7 +23,7 @@ const StyledInput = styled.input.attrs((props) => ({
   outline: none;
 `;
 
-const StyledOption = styled.option.attrs((props) => ({}))`
+const StyledOption = styled.option`
   size: 1em;
   color: black;
   font-size: 1em;
@@ -34,7 +31,7 @@ const StyledOption = styled.option.attrs((props) => ({}))`
   border-radius: 2px;
   outline: none;
 `;
-const StyledSelect = styled.select.attrs((props) => ({}))`
+const StyledSelect = styled.select`
   size: 1em;
   color: black;
   font-size: 1em;
@@ -101,7 +98,7 @@ const CloseButton = styled.button`
   }
 `;
 
-interface TodoData {
+export interface TodoData {
   id: string;
   title: string;
   status: string;
@@ -111,51 +108,77 @@ interface PopupProps {
   todoData: TodoData;
   open: boolean;
   onOpen: boolean;
-  onSave: () => void;
+  onSave: (body: TodoData) => any;
   onCancel: () => void;
-  // onDelete: () => void;
 }
 
 export const Popup = (props: PopupProps) => {
-  const {onSave, onCancel, todoData} = props;
+  const { onSave, onCancel, todoData } = props;
+  const [updatedTodo, setUpdatedTodo] = useState({
+    id: todoData.id,
+    title: todoData.title,
+    status: todoData.status,
+  });
+
+  const handleChangeTitle = (e: React.SyntheticEvent) => {
+    let target = e.target as HTMLInputElement;
+
+    setUpdatedTodo({ ...updatedTodo, title: target.value });
+  };
+
+  const handleChangeStatus = (e: React.SyntheticEvent) => {
+    let target = e.target as HTMLInputElement;
+    setUpdatedTodo({ ...updatedTodo, status: target.value });
+  };
+
+  const handleSubmitForm = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    onSave(updatedTodo);
+  };
+
   return (
     <>
-    {
-      todoData && (
+      {todoData && (
         <TodoPopup>
-        <TodoForm>
-          <>
+          <TodoForm onSubmit={handleSubmitForm}>
             <FormLabel>
               <h2>Update Todo</h2>
             </FormLabel>
             <DashedLine />
             <FormLabel>
               Title:
-              <StyledInput value={todoData.title}/>
+              <StyledInput
+                defaultValue={updatedTodo.title}
+                value={todoData.title}
+                onChange={handleChangeTitle}
+              />
             </FormLabel>
             <FormLabel>
               Status:
-              <StyledSelect defaultValue={todoData.status}>
-                <StyledOption value={Status["PENDING"]}>Pending</StyledOption>
-                <StyledOption value={Status["IN_PROGRESS"]}>
-                  In Progress
+              <StyledSelect
+                value={todoData.status}
+                onChange={handleChangeStatus}
+              >
+                <StyledOption defaultValue={Status.PENDING}>
+                  Pending
                 </StyledOption>
-                <StyledOption value={Status["DONE"]}>Done</StyledOption>
+                <StyledOption defaultValue={Status.IN_PROGRESS}>
+                  In progress
+                </StyledOption>
+                <StyledOption defaultValue={Status.DONE}>Done</StyledOption>
               </StyledSelect>
             </FormLabel>
-          </>
-        </TodoForm>
-        <ButtonContainer>
-              <StyledButton $primary >
+            <ButtonContainer>
+              <StyledButton $primary type="submit">
                 Save
               </StyledButton>
-              <StyledButton onClick={onCancel} >Cancel</StyledButton>
+              <StyledButton onClick={onCancel}>Cancel</StyledButton>
             </ButtonContainer>
-        <CloseButton onClick={onCancel} >X</CloseButton>
-      </TodoPopup>
-      )
-    }
-      
+          </TodoForm>
+
+          <CloseButton onClick={onCancel}>X</CloseButton>
+        </TodoPopup>
+      )}
     </>
   );
 };
