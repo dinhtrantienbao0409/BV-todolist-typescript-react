@@ -5,8 +5,8 @@ const LoadingContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%
   height: 100%;
-  margin-top: 10px;
 `;
 
 const rotateAnimation = keyframes`
@@ -19,10 +19,10 @@ const rotateAnimation = keyframes`
 `;
 
 const LoadingSpinner = styled.div`
-  width: 15px;
-  height: 15px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #3498db;
+  width: 60px;
+  height: 60px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
   border-radius: 50%;
   animation: ${rotateAnimation} 1s linear infinite;
 `;

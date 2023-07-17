@@ -31,7 +31,6 @@ export const todosApi = createApi({
     updateTodo: builder.mutation<any, any>({
       query: (updatedData) => {
         const { id, ...data } = updatedData;
-        console.log(data);
 
         return {
           url: `todos/${id}`,

@@ -1,6 +1,6 @@
 import { styled } from "styled-components";
 import { Status } from "../../constaints";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 const TodoPopup = styled.div`
   position: absolute;
@@ -114,6 +114,8 @@ interface PopupProps {
 
 export const Popup = (props: PopupProps) => {
   const { onSave, onCancel, todoData } = props;
+  console.log("🚀 ~ file: Popup.tsx:117 ~ Popup ~ todoData:", todoData.id)
+
   const [updatedTodo, setUpdatedTodo] = useState({
     id: todoData.id,
     title: todoData.title,
@@ -136,6 +138,7 @@ export const Popup = (props: PopupProps) => {
     onSave(updatedTodo);
   };
 
+
   return (
     <>
       {todoData && (
@@ -148,16 +151,20 @@ export const Popup = (props: PopupProps) => {
             <FormLabel>
               Title:
               <StyledInput
-                defaultValue={updatedTodo.title}
-                value={todoData.title}
+                key={todoData.id}
+                defaultValue={todoData.title}
+                // value={todoData.title}
                 onChange={handleChangeTitle}
+                // onChange={(e: any) => setUpdatedTodo({ ...updatedTodo, title: e.target.value })}
               />
             </FormLabel>
             <FormLabel>
               Status:
               <StyledSelect
-                value={todoData.status}
+                key={todoData.id}
+                defaultValue={todoData.status}
                 onChange={handleChangeStatus}
+                // onChange={(e: any) => setUpdatedTodo({ ...updatedTodo, status: e.target.value })}
               >
                 <StyledOption defaultValue={Status.PENDING}>
                   Pending

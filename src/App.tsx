@@ -3,6 +3,7 @@ import "./App.css";
 import { AddField } from "./components/AddField/AddField";
 import { TodoList } from "./components/TodoList/TodoList";
 import { styled } from "styled-components";
+import { LoadingComponent } from "./components/Loading/Loading";
 
 const AppContainer = styled.div`
   display: flex;
@@ -11,6 +12,7 @@ const AppContainer = styled.div`
 `;
 
 const TodoContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,7 +34,7 @@ const TodoUl = styled.ul`
 export const App: React.FC = () => {
   return (
     <AppContainer className="App">
-      <TodoContainer>
+      <TodoContainer className="todo-container">
         <AddField />
         <TodoUl>
           <TodoList />

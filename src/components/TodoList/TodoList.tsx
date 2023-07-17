@@ -190,8 +190,8 @@ export const TodoList = () => {
   useEffect(() => {}, []);
   return (
     <>
-      {isLoading && <LoadingComponent />}
-      {todosData && (
+        { isLoading && <LoadingComponent />}
+        {todosData && (
         <TodoHeader>
           <span>
             <TodoCheckbox
@@ -216,6 +216,7 @@ export const TodoList = () => {
       {todosData &&
         todosData.map((todo: any) => (
           <TodoItemContainerHover key={todo.id}>
+            
             <TodoCheckbox
               type="checkbox"
               id={todo.id}
@@ -263,6 +264,8 @@ export const TodoList = () => {
             </TodoButton>
           </TodoItemContainerHover>
         ))}
+     
+      
       {visible && todoData && (
         <>
           <BackgroundOverlay onClick={handleCancel} />
