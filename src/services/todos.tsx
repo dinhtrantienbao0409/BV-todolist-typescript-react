@@ -21,6 +21,12 @@ export const todosApi = createApi({
       },
       providesTags: ["Todos"],
     }),
+    getTodoById: builder.query<any, void>({
+      query: (id) => {
+        return { url: `todos/${id}`, method: "GET" };
+      },
+      providesTags: ["Todos"],
+    }),
     deleteTodo: builder.mutation<any, void>({
       query: (id) => {
         return { url: `todos/${id}`, method: "DELETE" };
@@ -45,4 +51,6 @@ export const {
   useGetAllTodosQuery,
   useDeleteTodoMutation,
   useCreateTodoMutation,
+  useLazyGetTodoByIdQuery,
+  useUpdateTodoMutation,
 } = todosApi;

@@ -1,14 +1,7 @@
 import { styled } from "styled-components";
 import { Status } from "../../constaints";
 
-interface PopupProps {
-  popupType: string;
-  open: boolean;
-  onOpen: boolean;
-  onSave: () => void;
-  onCancel: () => void;
-  // onDelete: () => void;
-}
+
 const TodoPopup = styled.div`
   position: absolute;
   top: 30%;
@@ -27,7 +20,7 @@ const StyledInput = styled.input.attrs((props) => ({
 }))`
   color: black;
   font-size: 1em;
-  border: 1px solid #bf4f74;
+  border: 1px solid #66ccff;
   border-radius: 2px;
   padding: 10px;
   outline: none;
@@ -37,7 +30,7 @@ const StyledOption = styled.option.attrs((props) => ({}))`
   size: 1em;
   color: black;
   font-size: 1em;
-  border: 1px solid #bf4f74;
+  border: 1px solid #66ccff;
   border-radius: 2px;
   outline: none;
 `;
@@ -45,7 +38,7 @@ const StyledSelect = styled.select.attrs((props) => ({}))`
   size: 1em;
   color: black;
   font-size: 1em;
-  border: 1px solid #bf4f74;
+  border: 1px solid #66ccff;
   border-radius: 2px
   width: 100%;
   padding: 10px;
@@ -81,11 +74,11 @@ const ButtonContainer = styled.div`
 `;
 
 const StyledButton = styled.button<{ $primary?: boolean }>`
-  background: ${(props) => (props.$primary ? "#BF4F74" : "white")};
-  color: ${(props) => (props.$primary ? "white" : "#BF4F74")};
+  background: ${(props) => (props.$primary ? "#66ccff" : "white")};
+  color: ${(props) => (props.$primary ? "white" : "#66ccff")};
   font-size: 1em;
   padding: 0.5em 1em;
-  border: 1px solid #bf4f74;
+  border: 1px solid #66ccff;
   border-radius: 3px;
   cursor: pointer;
   &:hover {
@@ -98,8 +91,8 @@ const CloseButton = styled.button`
   top: -10px;
   right: -10px;
   padding: 13px;
-  background-color: #bf4f74;
-  border: 1px solid #bf4f74;
+  background-color: #66ccff;
+  border: 1px solid #66ccff;
   border-radius: 50%;
   cursor: pointer;
   color: white;
@@ -108,49 +101,41 @@ const CloseButton = styled.button`
   }
 `;
 
-// const RadioGroup = styled.div`;
-//   display: flex;
-//   flex-direction: row;
-// `;
-// const DropdownSelect = styled.select`
-//   margin-bottom: 8px;
-//   padding: 4px;
-// `;
+interface TodoData {
+  id: string;
+  title: string;
+  status: string;
+}
 
-export const Popup: React.FC<PopupProps> = (onCancel) => {
+interface PopupProps {
+  todoData: TodoData;
+  open: boolean;
+  onOpen: boolean;
+  onSave: () => void;
+  onCancel: () => void;
+  // onDelete: () => void;
+}
+
+export const Popup = (props: PopupProps) => {
+  const {onSave, onCancel, todoData} = props;
   return (
     <>
-      <TodoPopup>
+    {
+      todoData && (
+        <TodoPopup>
         <TodoForm>
-          {/* {popupType.popupType && popupType.popupType == "update" ? ( */}
           <>
-            {/* <RadioGroup>
-              <FormLabel>
-                <input type="radio" value="option1" />
-                {Status["PENDING"]}
-              </FormLabel>
-
-              <FormLabel>
-                <input type="radio" value="option2" />
-                {Status["IN_PROGRESS"]}
-              </FormLabel>
-
-              <FormLabel>
-                <input type="radio" value="option3" />
-                {Status["DONE"]}
-              </FormLabel>
-            </RadioGroup> */}
             <FormLabel>
               <h2>Update Todo</h2>
             </FormLabel>
             <DashedLine />
             <FormLabel>
               Title:
-              <StyledInput />
+              <StyledInput value={todoData.title}/>
             </FormLabel>
             <FormLabel>
               Status:
-              <StyledSelect>
+              <StyledSelect defaultValue={todoData.status}>
                 <StyledOption value={Status["PENDING"]}>Pending</StyledOption>
                 <StyledOption value={Status["IN_PROGRESS"]}>
                   In Progress
@@ -158,25 +143,19 @@ export const Popup: React.FC<PopupProps> = (onCancel) => {
                 <StyledOption value={Status["DONE"]}>Done</StyledOption>
               </StyledSelect>
             </FormLabel>
-            <ButtonContainer>
-              <StyledButton $primary type="submit">
+          </>
+        </TodoForm>
+        <ButtonContainer>
+              <StyledButton $primary >
                 Save
               </StyledButton>
-              <StyledButton type="button">Cancel</StyledButton>
+              <StyledButton onClick={onCancel} >Cancel</StyledButton>
             </ButtonContainer>
-          </>
-          {/* ) : ( */}
-          {/* <>
-              <h3>Are you sure to delete this todo?</h3>
-              <div>
-                <button type="submit">Delete</button>
-                <button type="button">Cancel</button>
-              </div>
-            </>
-          )} */}
-        </TodoForm>
-        <CloseButton>X</CloseButton>
+        <CloseButton onClick={onCancel} >X</CloseButton>
       </TodoPopup>
+      )
+    }
+      
     </>
   );
 };

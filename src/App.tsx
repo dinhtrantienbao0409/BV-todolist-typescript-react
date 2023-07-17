@@ -3,6 +3,7 @@ import "./App.css";
 import { AddField } from "./components/AddField/AddField";
 import { TodoList } from "./components/TodoList/TodoList";
 import { styled } from "styled-components";
+import { Popup } from "./components/Popup/Popup";
 
 const AppContainer = styled.div`
   display: flex;
@@ -15,6 +16,7 @@ const TodoContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 50%;
+  margin-top: 70px;
 `;
 const TodoUl = styled.ul`
   width: 100%;
@@ -31,6 +33,7 @@ export const App: React.FC = () => {
             width: "50%",
           }}
         > */}
+        
         <AddField />
         <TodoUl>
           <TodoList
