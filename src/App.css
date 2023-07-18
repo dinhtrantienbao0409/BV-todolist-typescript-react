@@ -55,6 +55,7 @@ body {
 @media screen and (min-width: 400px) {
   body {
     background-color: lightgreen;
+    width: 100%;
   }
 }
 

@@ -10,6 +10,16 @@ import {
 } from "../../services/todos";
 import { LoadingComponent } from "../Loading/Loading";
 import { AddField } from "../AddField/AddField";
+import { ReactComponent as Dot } from "../../assets/statusDot.svg";
+import { ReactComponent as DeleteIcon } from "../../assets/deleteIcon.svg";
+import { ReactComponent as UpdateIcon } from "../../assets/updateIcon.svg";
+import { Status, filterListName } from "../../constaints";
+
+interface Todo {
+  id: string;
+  title: string;
+  status: "Pending" | "In progress" | "Done";
+}
 
 interface IChecked {
   id: string;
@@ -34,7 +44,7 @@ const colorStatusDot: ColorStatusType = {
 };
 const TodoHeader = styled.li`
   display: flex;
-  align-tiem: center;
+  align-items: center;
   padding: 20px 0px;
   color: #333;
   background-color: rgba(255, 228, 225);
@@ -52,6 +62,14 @@ const TodoItemContainer = styled.li`
   border-radius: 2px;
   border: none;
   width: 100%;
+
+  @media screen and (min-width: 760px) {
+    .column {
+      display: flex;
+      flex-direction: column;
+      width: 50%;
+    }
+  }
 `;
 
 const TodoText = styled.span<{ $textDecorationLine?: boolean }>`
@@ -77,18 +95,45 @@ const TodoStatus = styled.span<{ color: string }>`
   color: black;
   font-weight: bold;
   margin-right: 50px;
+  @media (max-width: 900px) {
+    font-size: 11px; /* Reduce font size for smaller screens */
+  }
+
+  @media (max-width: 400px) {
+    font-size: 9px; /* Further reduce font size for even smaller screens */
+  }
 `;
 
 const TodoButton = styled.button<{ $color?: boolean }>`
   margin: 0 10px 0 0;
   padding: 5px 10px;
-  visibility: hidden;
   cursor: pointer;
   font-weight: bold;
   border: none;
-  background-color: rgba(253, 245, 230);
+  background: none;
+  outline: none;
   &:hover {
     color: ${(props) => (props.$color ? "green" : "red")};
+  }
+`;
+
+const UpdateButtonIcon = styled(UpdateIcon)`
+  width: 25px;
+  height: 25px;
+  &:hover {
+    transition: 0.2s;
+    filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg)
+      brightness(119%) contrast(119%);
+  }
+`;
+
+const DeleteButtonIcon = styled(DeleteIcon)`
+  width: 25px;
+  height: 25px;
+  &:hover {
+    transition: 0.2s;
+    filter: invert(48%) sepia(72%) saturate(6014%) hue-rotate(342deg)
+      brightness(101%) contrast(100%);
   }
 `;
 
@@ -115,6 +160,7 @@ const DeleteAllButton = styled.button`
   color: white;
   cursor: pointer;
   &:hover {
+    transition: 0.3s;
     transform: scale(1.1);
   }
 `;
@@ -130,17 +176,31 @@ const BackgroundOverlay = styled.div`
   z-index: 0.5;
 `;
 
+const StatusDot = styled(Dot)``;
+
 export const TodoList = () => {
   const [visible, setVisible] = useState(false);
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [checkedList, setIsCheck] = useState<IChecked[]>([]);
+  const [todoList, setTodoList] = useState<Todo[]>([]);
+  // console.log("🚀 ~ file: TodoList.tsx:176 ~ TodoList ~ todoList:", todoList);
+  const [filter, setFilter] = useState<
+    "All" | "Pending" | "In progress" | "Done"
+  >("All");
+  // console.log("🚀 ~ file: TodoList.tsx:182 ~ TodoList ~ filter:", filter);
 
-  const { data: todosData, error, isLoading } = useGetAllTodosQuery();
+  const {
+    data: todosData,
+    error: todosError,
+    isLoading: todosLoading,
+  } = useGetAllTodosQuery();
+
   const [
     trigger,
-    { data: todoData, error: errTodoData, isLoading: isLoadingTodoData },
+    { data: todoData, error: todoError, isLoading: todoLoading, isFetching },
   ] = useLazyGetTodoByIdQuery();
-  const [addTodo, { isLoading: CreateLoading, isError, isSuccess }] =
+
+  const [addTodo, { isLoading: createLoading, isError, isSuccess }] =
     useCreateTodoMutation();
 
   const [
@@ -151,11 +211,16 @@ export const TodoList = () => {
       isSuccess: delelteSuccess,
     },
   ] = useDeleteTodoMutation();
+
   const [updateTodo, updateRes] = useUpdateTodoMutation();
 
-  const handleOpenPopup = (e: React.SyntheticEvent) => {
-    let target = e.target as HTMLButtonElement;
+  const handleOpenPopup = (e: React.SyntheticEvent, id: any) => {
+    trigger(id);
     setVisible(true);
+  };
+
+  const handleCreate = (createdData: TodoData) => {
+    addTodo(createdData);
   };
 
   const handleConfirmUpdate = (updatedData: TodoData) => {
@@ -164,11 +229,12 @@ export const TodoList = () => {
     setVisible(false);
   };
 
-  const handleCancel = () => {
-    setVisible(false);
-  };
   const handleConfirmDelete = (id: any) => {
     deteleTodo(id);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
   };
 
   const handleCheck = (e: any) => {
@@ -187,11 +253,40 @@ export const TodoList = () => {
     }
   };
 
-  useEffect(() => {}, []);
+  const handleFilter = (e: React.SyntheticEvent) => {
+    let target = e.target as HTMLButtonElement;
+    setFilter(target.value as Todo["status"]);
+  };
+
+  const FilterTodo = () => {
+    switch (filter) {
+      case "Pending":
+        const pendingTodo = todoList.filter(
+          (todo) => todo.status === Status.PENDING
+        );
+        return pendingTodo;
+      case "In progress":
+        const inProgressTodo = todoList.filter(
+          (todo) => todo.status === Status.IN_PROGRESS
+        );
+        return inProgressTodo;
+      case "Done":
+        const doneTodo = todoList.filter((todo) => todo.status === Status.DONE);
+        return doneTodo;
+      default:
+        return todoList;
+    }
+  };
+
+  useEffect(() => {
+    setTodoList(todosData);
+  }, [todosData]);
   return (
     <>
-        { isLoading && <LoadingComponent />}
-        {todosData && (
+      <AddField onCreate={handleCreate} />
+
+      {todosLoading && <LoadingComponent />}
+      {FilterTodo() && (
         <TodoHeader>
           <span>
             <TodoCheckbox
@@ -201,7 +296,31 @@ export const TodoList = () => {
               onChange={() => {}}
             />
           </span>
-          <span style={{ flexGrow: 1 }}>Total: {todosData.length}</span>
+          <span>Total: {FilterTodo().length}</span>
+          {}
+          <span style={{ flexGrow: 1 }}>
+            <LoadingComponent />
+          </span>
+          <span>
+            {filterListName &&
+              filterListName.map((filterName) => (
+                <TodoButton
+                  onClick={handleFilter}
+                  key={filterName.id}
+                  value={filterName.filterName}
+                >
+                  {filterName.filterName}
+                </TodoButton>
+              ))}
+          </span>
+          {/* <span>
+            <select id="filter" value={filter} onChange={handleFilter}>
+              <option value="All">All</option>
+              <option value="Pending">Pending</option>
+              <option value="In progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+          </span> */}
           <DeleteAllButton
             onClick={() => {
               checkedList.map((checkedItem) => {
@@ -213,10 +332,9 @@ export const TodoList = () => {
           </DeleteAllButton>
         </TodoHeader>
       )}
-      {todosData &&
-        todosData.map((todo: any) => (
+      {FilterTodo() &&
+        FilterTodo().map((todo: any) => (
           <TodoItemContainerHover key={todo.id}>
-            
             <TodoCheckbox
               type="checkbox"
               id={todo.id}
@@ -224,48 +342,32 @@ export const TodoList = () => {
               checked={checkedList.includes(todo.id)}
               onChange={() => {}}
             />
-            {todo.status === "Done" ? (
-              <TodoText $textDecorationLine>{todo.title}</TodoText>
-            ) : (
-              <TodoText>{todo.title}</TodoText>
-            )}
+
+            <TodoText $textDecorationLine={todo.status === "Done"}>
+              {todo.title}
+            </TodoText>
+
             <TodoStatus
               color={colorStatusOpts[todo.status as keyof ColorStatusType]}
             >
-              <svg
-                stroke="currentColor"
-                fill="currentColor"
-                strokeWidth="0"
-                viewBox="0 0 24 24"
-                className="text-yellow-500 text-sm font-extralight"
-                height="1em"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-                color={colorStatusDot[todo.status as keyof ColorStatusType]}
-              >
-                <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z"></path>
-              </svg>
+              <StatusDot />
               {todo.status}
             </TodoStatus>
             <TodoButton
               $color
-              onClick={(event: React.SyntheticEvent) => {
-                trigger(todo.id);
-                handleOpenPopup(event);
-              }}
+              onClick={(e: React.SyntheticEvent) => handleOpenPopup(e, todo.id)}
             >
-              Update
+              <UpdateButtonIcon />
             </TodoButton>
             <TodoButton
               onClick={() => handleConfirmDelete(todo.id)}
               disabled={deleteLoading}
             >
-              Delete
+              <DeleteButtonIcon />
             </TodoButton>
           </TodoItemContainerHover>
         ))}
-     
-      
+
       {visible && todoData && (
         <>
           <BackgroundOverlay onClick={handleCancel} />

@@ -4,10 +4,12 @@ import { useCreateTodoMutation } from "../../services/todos";
 import { v4 } from "uuid";
 import { Status } from "../../constaints";
 import { LoadingComponent } from "../Loading/Loading";
+import { TodoData } from "../Popup/Popup";
 
 const StyledAddField = styled.div`
   position: relative;
   width: 100%;
+  margin-bottom: 20px;
 `;
 
 const StyledInput = styled.input`
@@ -15,7 +17,7 @@ const StyledInput = styled.input`
   font-size: 1em;
   border: 2px solid rgba(255, 228, 225);
   border-radius: 5px;
-  padding: 30px 10px;
+  padding: 10px 10px;
   width: 100%;
   outline: none;
   box-sizing: border-box;
@@ -28,20 +30,18 @@ const StyledButton = styled.button`
   right: 0;
   top: 0;
   margin-right: -2px;
-  padding: 30px 20px;
+  padding: 10px 80px;
   border: 2px solid rgba(255, 228, 225);
   border-radius: 3px;
   position: absolute;
+  cursor: pointer;
 `;
 interface AddFieldProps {
-  loading: boolean;
+  onCreate: (body: TodoData) => any;
 }
 
-export const AddField = () => {
+export const AddField = ({ onCreate }: AddFieldProps) => {
   const [todoTitle, setTodoTitle] = useState("");
-
-  const [addTodo, { isLoading: createLoading, isError, isSuccess }] =
-    useCreateTodoMutation();
 
   const handleChangeTitle = (e: React.SyntheticEvent) => {
     let target = e.target as HTMLInputElement;
@@ -50,7 +50,7 @@ export const AddField = () => {
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    addTodo({ id: v4(), title: todoTitle, status: Status.PENDING });
+    onCreate({ id: v4(), title: todoTitle, status: Status.PENDING });
     setTodoTitle("");
     // setIsLoading(true);
   };
@@ -63,7 +63,6 @@ export const AddField = () => {
             value={todoTitle}
             onChange={handleChangeTitle}
             placeholder="Create new task..."
-            disabled={createLoading}
           />
           <StyledButton type="submit">+</StyledButton>
         </form>

@@ -27,7 +27,6 @@ const StyledOption = styled.option`
   size: 1em;
   color: black;
   font-size: 1em;
-  border: 1px solid #66ccff;
   border-radius: 2px;
   outline: none;
 `;
@@ -36,7 +35,7 @@ const StyledSelect = styled.select`
   color: black;
   font-size: 1em;
   border: 1px solid #66ccff;
-  border-radius: 2px
+  border-radius: 2px;
   width: 100%;
   padding: 10px;
   outline: none;
@@ -114,7 +113,8 @@ interface PopupProps {
 
 export const Popup = (props: PopupProps) => {
   const { onSave, onCancel, todoData } = props;
-  console.log("🚀 ~ file: Popup.tsx:117 ~ Popup ~ todoData:", todoData.id)
+
+  const updatedId = useRef();
 
   const [updatedTodo, setUpdatedTodo] = useState({
     id: todoData.id,
@@ -124,7 +124,6 @@ export const Popup = (props: PopupProps) => {
 
   const handleChangeTitle = (e: React.SyntheticEvent) => {
     let target = e.target as HTMLInputElement;
-
     setUpdatedTodo({ ...updatedTodo, title: target.value });
   };
 
@@ -133,17 +132,20 @@ export const Popup = (props: PopupProps) => {
     setUpdatedTodo({ ...updatedTodo, status: target.value });
   };
 
+  const handleChangeId = () => {
+    setUpdatedTodo({ ...updatedTodo, id: todoData.id });
+  };
+
   const handleSubmitForm = (e: React.SyntheticEvent) => {
     e.preventDefault();
     onSave(updatedTodo);
   };
 
-
   return (
     <>
       {todoData && (
-        <TodoPopup>
-          <TodoForm onSubmit={handleSubmitForm}>
+        <TodoPopup onClick={handleChangeId}>
+          <TodoForm onSubmit={handleSubmitForm} onClick={handleChangeId}>
             <FormLabel>
               <h2>Update Todo</h2>
             </FormLabel>

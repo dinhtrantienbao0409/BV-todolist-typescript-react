@@ -3,12 +3,16 @@ import "./App.css";
 import { AddField } from "./components/AddField/AddField";
 import { TodoList } from "./components/TodoList/TodoList";
 import { styled } from "styled-components";
-import { LoadingComponent } from "./components/Loading/Loading";
 
 const AppContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
+  @media screen and (max-width: 300px) {
+    .column {
+      width: 100%;
+    }
+  }
 `;
 
 const TodoContainer = styled.div`
@@ -16,15 +20,13 @@ const TodoContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 50%;
+  width: 70%;
   margin-top: 70px;
-  @media screen and (min-width: 768px) {
+  @media screen and (max-width: 768px) {
     width: 80%;
   }
-  @media screen and (max-width: 992px) {
-    .column {
-      width: 50%;
-    }
+  @media screen and (max-width: 1130px) {
+    width: 90%;
   }
 `;
 const TodoUl = styled.ul`
@@ -35,7 +37,6 @@ export const App: React.FC = () => {
   return (
     <AppContainer className="App">
       <TodoContainer className="todo-container">
-        <AddField />
         <TodoUl>
           <TodoList />
         </TodoUl>
