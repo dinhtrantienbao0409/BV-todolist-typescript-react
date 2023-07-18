@@ -183,25 +183,36 @@ export const TodoList = () => {
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [checkedList, setIsCheck] = useState<IChecked[]>([]);
   const [todoList, setTodoList] = useState<Todo[]>([]);
-  // console.log("🚀 ~ file: TodoList.tsx:176 ~ TodoList ~ todoList:", todoList);
   const [filter, setFilter] = useState<
     "All" | "Pending" | "In progress" | "Done"
   >("All");
-  // console.log("🚀 ~ file: TodoList.tsx:182 ~ TodoList ~ filter:", filter);
 
   const {
     data: todosData,
-    error: todosError,
-    isLoading: todosLoading,
+    isLoading: fetchAllLoading,
+    error: fetchAllError,
+    isSuccess: fetchAllSuccess,
   } = useGetAllTodosQuery();
 
   const [
     trigger,
-    { data: todoData, error: todoError, isLoading: todoLoading, isFetching },
+    {
+      data: todoData,
+      isLoading: fetchLoading,
+      error: fetchError,
+      isSuccess: fetchSuccess,
+      isFetching,
+    },
   ] = useLazyGetTodoByIdQuery();
 
-  const [addTodo, { isLoading: createLoading, isError, isSuccess }] =
-    useCreateTodoMutation();
+  const [
+    addTodo,
+    {
+      isLoading: createLoading,
+      isError: createError,
+      isSuccess: createSuccess,
+    },
+  ] = useCreateTodoMutation();
 
   const [
     deteleTodo,
@@ -212,7 +223,14 @@ export const TodoList = () => {
     },
   ] = useDeleteTodoMutation();
 
-  const [updateTodo, updateRes] = useUpdateTodoMutation();
+  const [
+    updateTodo,
+    {
+      isLoading: updateLoading,
+      isError: updateError,
+      isSuccess: updateSuccess,
+    },
+  ] = useUpdateTodoMutation();
 
   const handleOpenPopup = (e: React.SyntheticEvent, id: any) => {
     trigger(id);
@@ -285,7 +303,7 @@ export const TodoList = () => {
     <>
       <AddField onCreate={handleCreate} />
 
-      {todosLoading && <LoadingComponent />}
+      {fetchAllLoading && <LoadingComponent />}
       {FilterTodo() && (
         <TodoHeader>
           <span>
