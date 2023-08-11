@@ -10,10 +10,10 @@ const LoadingContainer = styled.div`
 `;
 
 const rotateAnimation = keyframes`
-  0% {
+  from {
     transform: rotate(0deg);
   }
-  100% {
+  to {
     transform: rotate(360deg);
   }
 `;

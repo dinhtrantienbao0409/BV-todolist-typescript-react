@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { styled } from "styled-components";
 import { Popup, TodoData } from "../Popup/Popup";
 import {
@@ -14,6 +14,7 @@ import { ReactComponent as Dot } from "../../assets/statusDot.svg";
 import { ReactComponent as DeleteIcon } from "../../assets/deleteIcon.svg";
 import { ReactComponent as UpdateIcon } from "../../assets/updateIcon.svg";
 import { Status, filterListName } from "../../constaints";
+import { Alert } from "../Alert/Alert";
 
 interface Todo {
   id: string;
@@ -49,27 +50,26 @@ const TodoHeader = styled.li`
   color: #333;
   background-color: rgba(255, 228, 225);
   border-radius: 2px;
-  border-bottom: 1px solid white;
   width: 100%;
+  @media screen and (max-width: 626px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+  }
 `;
 
-const TodoItemContainer = styled.li`
-  display: flex;
-  align-items: center;
-  padding: 20px 0;
-  color: #333;
+const TodoItemContainer = styled(TodoHeader)`
   background-color: white;
-  border-radius: 2px;
-  border: none;
-  width: 100%;
-
-  @media screen and (min-width: 760px) {
-    .column {
-      display: flex;
-      flex-direction: column;
-      width: 50%;
-    }
+  border-bottom: 1px solid rgba(255, 228, 225);
+  @media screen and (max-width: 626px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    margin: 0;
   }
+  outline: none;
 `;
 
 const TodoText = styled.span<{ $textDecorationLine?: boolean }>`
@@ -94,7 +94,6 @@ const TodoStatus = styled.span<{ color: string }>`
   font-size: 13px;
   color: black;
   font-weight: bold;
-  margin-right: 50px;
   @media (max-width: 900px) {
     font-size: 11px; /* Reduce font size for smaller screens */
   }
@@ -104,7 +103,7 @@ const TodoStatus = styled.span<{ color: string }>`
   }
 `;
 
-const TodoButton = styled.button<{ $color?: boolean }>`
+const TodoButton = styled.button<{ $color?: boolean; $type?: boolean }>`
   margin: 0 10px 0 0;
   padding: 5px 10px;
   cursor: pointer;
@@ -112,6 +111,7 @@ const TodoButton = styled.button<{ $color?: boolean }>`
   border: none;
   background: none;
   outline: none;
+  height: 100%;
   &:hover {
     color: ${(props) => (props.$color ? "green" : "red")};
   }
@@ -175,6 +175,29 @@ const BackgroundOverlay = styled.div`
   opacity: 0.2;
   z-index: 0.5;
 `;
+
+const MessageContainer = styled.span`
+  margin: 20px 0;
+`;
+
+const FilterContainer = styled.span`
+  @media screen and (max-width: 626px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  :focus {
+    outline: 1px solid;
+  }
+`;
+
+const FilterList = styled.ul`
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+`;
+
+const FilterItem = styled.li``;
 
 const StatusDot = styled(Dot)``;
 
@@ -299,10 +322,17 @@ export const TodoList = () => {
   useEffect(() => {
     setTodoList(todosData);
   }, [todosData]);
+
   return (
     <>
       <AddField onCreate={handleCreate} />
-
+      <MessageContainer>
+        {createSuccess || delelteSuccess || updateSuccess ? (
+          <Alert type="success" message="Successfully!" timeout={3000} />
+        ) : createError || deleteError || updateError ? (
+          <Alert type="error" message="Failed!" timeout={3000} />
+        ) : null}
+      </MessageContainer>
       {fetchAllLoading && <LoadingComponent />}
       {FilterTodo() && (
         <TodoHeader>
@@ -315,22 +345,43 @@ export const TodoList = () => {
             />
           </span>
           <span>Total: {FilterTodo().length}</span>
-          {}
+
           <span style={{ flexGrow: 1 }}>
-            <LoadingComponent />
+            {fetchLoading || createLoading || deleteLoading || updateLoading ? (
+              <LoadingComponent />
+            ) : null}
           </span>
-          <span>
-            {filterListName &&
-              filterListName.map((filterName) => (
-                <TodoButton
-                  onClick={handleFilter}
-                  key={filterName.id}
-                  value={filterName.filterName}
-                >
-                  {filterName.filterName}
-                </TodoButton>
-              ))}
-          </span>
+
+          <FilterContainer>
+            <nav aria-label="Filter">
+              {/* {filterListName &&
+                filterListName.map((filterName) => (
+                  <TodoButton
+                    $type
+                    onClick={handleFilter}
+                    key={filterName.id}
+                    value={filterName.filterName}
+                  >
+                    {filterName.filterName}
+                  </TodoButton> */}
+              <FilterList>
+                {filterListName &&
+                  filterListName.map((filterName) => (
+                    <FilterItem>
+                      <TodoButton
+                        $type
+                        onClick={handleFilter}
+                        key={filterName.id}
+                        value={filterName.filterName}
+                      >
+                        {filterName.filterName}
+                      </TodoButton>
+                    </FilterItem>
+                  ))}
+              </FilterList>
+              {/* ))} */}
+            </nav>
+          </FilterContainer>
           {/* <span>
             <select id="filter" value={filter} onChange={handleFilter}>
               <option value="All">All</option>
@@ -340,6 +391,8 @@ export const TodoList = () => {
             </select>
           </span> */}
           <DeleteAllButton
+            aria-disabled={`${isCheckAll ? "false" : "true"}`}
+            // aria-disabled="true"
             onClick={() => {
               checkedList.map((checkedItem) => {
                 handleConfirmDelete(checkedItem);
@@ -352,7 +405,7 @@ export const TodoList = () => {
       )}
       {FilterTodo() &&
         FilterTodo().map((todo: any) => (
-          <TodoItemContainerHover key={todo.id}>
+          <TodoItemContainerHover key={todo.id} aria-label={todo.title}>
             <TodoCheckbox
               type="checkbox"
               id={todo.id}
@@ -385,7 +438,6 @@ export const TodoList = () => {
             </TodoButton>
           </TodoItemContainerHover>
         ))}
-
       {visible && todoData && (
         <>
           <BackgroundOverlay onClick={handleCancel} />

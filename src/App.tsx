@@ -9,9 +9,7 @@ const AppContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   @media screen and (max-width: 300px) {
-    .column {
-      width: 100%;
-    }
+    width: 100%;
   }
 `;
 
@@ -22,7 +20,7 @@ const TodoContainer = styled.div`
   align-items: center;
   width: 70%;
   margin-top: 70px;
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 760px) {
     width: 80%;
   }
   @media screen and (max-width: 1130px) {
@@ -32,12 +30,15 @@ const TodoContainer = styled.div`
 const TodoUl = styled.ul`
   width: 100%;
   padding: 0;
+  @media screen and (max-width: 626px) {
+    box-sizing: border-box;
+  }
 `;
 export const App: React.FC = () => {
   return (
     <AppContainer className="App">
       <TodoContainer className="todo-container">
-        <TodoUl>
+        <TodoUl aria-label="todo list">
           <TodoList />
         </TodoUl>
       </TodoContainer>

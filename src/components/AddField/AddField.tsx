@@ -5,11 +5,15 @@ import { v4 } from "uuid";
 import { Status } from "../../constaints";
 import { LoadingComponent } from "../Loading/Loading";
 import { TodoData } from "../Popup/Popup";
+import useFormInput from "../../hooks/useFormInput";
 
 const StyledAddField = styled.div`
   position: relative;
   width: 100%;
   margin-bottom: 20px;
+  @media screen and (max-width: 626px) {
+    width: 80%;
+  }
 `;
 
 const StyledInput = styled.input`
@@ -19,7 +23,6 @@ const StyledInput = styled.input`
   border-radius: 5px;
   padding: 10px 10px;
   width: 100%;
-  outline: none;
   box-sizing: border-box;
 `;
 
@@ -35,36 +38,53 @@ const StyledButton = styled.button`
   border-radius: 3px;
   position: absolute;
   cursor: pointer;
+  @media screen and (max-width: 626px) {
+    padding: 10px 40px;
+  }
 `;
 interface AddFieldProps {
   onCreate: (body: TodoData) => any;
 }
 
 export const AddField = ({ onCreate }: AddFieldProps) => {
-  const [todoTitle, setTodoTitle] = useState("");
-
-  const handleChangeTitle = (e: React.SyntheticEvent) => {
-    let target = e.target as HTMLInputElement;
-    setTodoTitle(target.value);
-  };
+  const todoTitle = useFormInput("");
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    onCreate({ id: v4(), title: todoTitle, status: Status.PENDING });
-    setTodoTitle("");
-    // setIsLoading(true);
+    onCreate({
+      id: v4(),
+      title: todoTitle.defaultValue,
+      status: Status.PENDING,
+    });
   };
 
   return (
     <>
       <StyledAddField className="add-component">
-        <form style={{ width: "100%" }} onSubmit={handleSubmit}>
+        <form
+          style={{ width: "100%" }}
+          id="create"
+          role="create"
+          action="/create/"
+          onSubmit={handleSubmit}
+        >
           <StyledInput
-            value={todoTitle}
-            onChange={handleChangeTitle}
+            {...todoTitle}
+            type="create"
+            id="create-input"
+            name="create"
+            spellCheck="false"
             placeholder="Create new task..."
+            tabIndex={0}
           />
-          <StyledButton type="submit">+</StyledButton>
+          <StyledButton
+            type="submit"
+            role="button"
+            aria-label="create"
+            id="createBtn"
+          >
+            +
+          </StyledButton>
         </form>
       </StyledAddField>
     </>

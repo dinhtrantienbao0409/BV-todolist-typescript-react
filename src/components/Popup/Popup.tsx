@@ -1,6 +1,7 @@
 import { styled } from "styled-components";
 import { Status } from "../../constaints";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+import useFormInput from "../../hooks/useFormInput";
 
 const TodoPopup = styled.div`
   position: absolute;
@@ -11,7 +12,11 @@ const TodoPopup = styled.div`
   background-color: #ffffff;
   border: 1px solid #dddddd;
   border-radius: 4px;
-  width: 30%;
+  width: 40%;
+  @media screen and (max-width: 760px) {
+    width: 80%;
+    height: 30%;
+  }
 `;
 
 const StyledInput = styled.input`
@@ -114,8 +119,6 @@ interface PopupProps {
 export const Popup = (props: PopupProps) => {
   const { onSave, onCancel, todoData } = props;
 
-  const updatedId = useRef();
-
   const [updatedTodo, setUpdatedTodo] = useState({
     id: todoData.id,
     title: todoData.title,
@@ -155,9 +158,7 @@ export const Popup = (props: PopupProps) => {
               <StyledInput
                 key={todoData.id}
                 defaultValue={todoData.title}
-                // value={todoData.title}
                 onChange={handleChangeTitle}
-                // onChange={(e: any) => setUpdatedTodo({ ...updatedTodo, title: e.target.value })}
               />
             </FormLabel>
             <FormLabel>
@@ -166,7 +167,6 @@ export const Popup = (props: PopupProps) => {
                 key={todoData.id}
                 defaultValue={todoData.status}
                 onChange={handleChangeStatus}
-                // onChange={(e: any) => setUpdatedTodo({ ...updatedTodo, status: e.target.value })}
               >
                 <StyledOption defaultValue={Status.PENDING}>
                   Pending
